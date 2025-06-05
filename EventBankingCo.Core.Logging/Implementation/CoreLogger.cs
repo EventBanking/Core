@@ -24,27 +24,28 @@ namespace EventBankingCo.Core.Logging.Implementation
         #region ICoreLogger Implementation
 
         public void LogTrace(string message, string memberName = "", string filePath = "") =>
-            _logger.LogTrace(message, "{MemberName} | Class: {ClassName} | TraceId: {TraceId}",
-                memberName, GetFileName(filePath), GetTraceId());
+            _logger.LogTrace("TraceId: {TraceId} | Class: {ClassName} | Method: {MemberName} | {Message}",
+                GetTraceId(), GetFileName(filePath), memberName, message);
 
         public void LogDebug(string message, string memberName = "", string filePath = "") =>
-            _logger.LogDebug("{Message} | Method: {MemberName} | Class: {ClassName} | TraceId: {TraceId}",
-                message, memberName, GetFileName(filePath), GetTraceId());
-        public void LogInformation(string message, string memberName = "", string filePath = "") => 
-            _logger.LogInformation("{Message} | Method: {MemberName} | Class: {ClassName} | TraceId: {TraceId}",
-                message, memberName, GetFileName(filePath), GetTraceId());
+            _logger.LogDebug("TraceId: {TraceId} | Class: {ClassName} | Method: {MemberName} | {Message}",
+                GetTraceId(), GetFileName(filePath), memberName, message);
 
-        public void LogWarning(string message, Exception? ex = null, string memberName = "", string filePath = "") => 
-            _logger.LogWarning(ex, "{Message} | Method: {MemberName} | Class: {ClassName} | TraceId: {TraceId}",
-                message, memberName, GetFileName(filePath), GetTraceId());
+        public void LogInformation(string message, string memberName = "", string filePath = "") =>
+            _logger.LogInformation("TraceId: {TraceId} | Class: {ClassName} | Method: {MemberName} | {Message}",
+                GetTraceId(), GetFileName(filePath), memberName, message);
+
+        public void LogWarning(string message, Exception? ex = null, string memberName = "", string filePath = "") =>
+            _logger.LogWarning(ex, "TraceId: {TraceId} | Class: {ClassName} | Method: {MemberName} | {Message}",
+                GetTraceId(), GetFileName(filePath), memberName, message);
 
         public void LogError(string message, Exception? ex = null, string memberName = "", string filePath = "") => 
-            _logger.LogError(ex, "{Message} | Method: {MemberName} | Class: {ClassName} | TraceId: {TraceId}",
-                message, memberName, GetFileName(filePath), GetTraceId());
+            _logger.LogError(ex, "TraceId: {TraceId} | Class: {ClassName} | Method: {MemberName} | {Message}",
+                GetTraceId(), GetFileName(filePath), memberName, message);
 
         public void LogCritical(string message, Exception? ex = null, string memberName = "", string filePath = "") => 
-            _logger.LogCritical(ex, "{Message} | Method: {MemberName} | Class: {ClassName} | TraceId: {TraceId}",
-                message, memberName, GetFileName(filePath), GetTraceId());
+            _logger.LogCritical(ex, "TraceId: {TraceId} | Class: {ClassName} | Method: {MemberName} | {Message}",
+                GetTraceId(), GetFileName(filePath), memberName, message);
     
         #endregion
 
