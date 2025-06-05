@@ -1,0 +1,57 @@
+name: Publish NuGet Packages
+
+on:
+  push:
+    branches:
+      - main  # Triggers when PRs are merged into main
+
+jobs:
+  publish:
+    name: Build and Publish Core NuGet Packages
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v1
+        with:
+          versionSpec: '5.x'
+
+      - name: Run GitVersion
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v1
+
+      - name: Restore dependencies
+        run: dotnet restore EventBankingCo.Core.sln
+
+      - name: Build solution
+        run: dotnet build EventBankingCo.Core.sln --configuration Release --no-restore
+
+      - name: Pack Domain project
+        run: |
+          dotnet pack ./EventBankingCo.Core.Domain/EventBankingCo.Core.Domain.csproj \
+            --configuration Release \
+            --no-build \
+            --output ./nupkgs \
+            /p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }}
+
+      - name: Pack Logging project
+        run: |
+          dotnet pack ./EventBankingCo.Core.Logging/EventBankingCo.Core.Logging.csproj \
+            --configuration Release \
+            --no-build \
+            --output ./nupkgs \
+            /p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }}
+
+      - name: Push packages to NuGet
+        run: |
+          dotnet nuget push "./nupkgs/*.nupkg" \
+            --source https://api.nuget.org/v3/index.json \
+            --api-key ${{ secrets.NUGET_API_KEY }}
