@@ -7,6 +7,8 @@ using EventBankingCo.Core.Logging.Abstraction;
 using EventBankingCo.Core.Logging.Configurations;
 using EventBankingCo.Core.Logging.Implementation;
 using EventBankingCo.Core.Logging.Extensions;
+using Microsoft.AspNetCore.Builder;
+using System.Diagnostics;
 
 namespace EventBankingCo.Core.Logging.DependencyInjection
 {
@@ -21,6 +23,9 @@ namespace EventBankingCo.Core.Logging.DependencyInjection
 
             Log.Logger = loggerConfig.CreateLogger();
 
+            Activity.DefaultIdFormat = ActivityIdFormat.W3C;
+            Activity.ForceDefaultIdFormat = true;
+
             services.AddSingleton(levelSwitches); // Optional if runtime adjustment is desired
             
             services.AddLogging(loggingBuilder =>
@@ -31,6 +36,13 @@ namespace EventBankingCo.Core.Logging.DependencyInjection
 
             services.AddSingleton<ICoreLogger, CoreLogger>();
             return services;
+        }
+
+        public static WebApplication ApplyCoreLogging(this WebApplication app)
+        {
+            app.UseSerilogRequestLogging();
+
+            return app;
         }
     }
 }
