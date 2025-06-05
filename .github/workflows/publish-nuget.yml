@@ -14,8 +14,8 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          
+          fetch-depth: 0  # Required for GitVersion to work properly
+
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
@@ -29,6 +29,13 @@ jobs:
       - name: Run GitVersion
         id: gitversion
         uses: gittools/actions/gitversion/execute@v1
+        with:
+          useConfigFile: true  # Ensures it uses GitVersion.yml if present
+
+      - name: Output GitVersion Information
+        run: |
+          echo "FullSemVer: ${{ steps.gitversion.outputs.fullSemVer }}"
+          echo "NuGet Version: ${{ steps.gitversion.outputs.nuGetVersionV2 }}"
 
       - name: Restore dependencies
         run: dotnet restore EventBankingCo.Core.sln
@@ -56,4 +63,5 @@ jobs:
         run: |
           dotnet nuget push "./nupkgs/*.nupkg" \
             --source https://api.nuget.org/v3/index.json \
-            --api-key ${{ secrets.NUGET_API_KEY }}
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --skip-duplicate

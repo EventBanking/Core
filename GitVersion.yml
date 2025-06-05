@@ -1,0 +1,35 @@
+mode: ContinuousDeployment
+
+branches:
+  main:
+    regex: ^main$
+    increment: Minor
+    prevent-increment-of-merged-branch-version: true
+    is-release-branch: true
+
+  feature:
+    regex: ^features?[/-]
+    increment: Patch
+    track-merge-target: true
+
+  pull-request:
+    regex: ^(pull|pr)[/-]
+    increment: Patch
+    tag: pr
+    is-release-branch: false
+
+  hotfix:
+    regex: ^hotfix(es)?[/-]
+    increment: Patch
+    is-release-branch: true
+
+  release:
+    regex: ^releases?[/-]
+    increment: Patch
+    tag: rc
+    is-release-branch: true
+
+ignore:
+  sha: []
+
+commit-message-incrementing: Enabled
