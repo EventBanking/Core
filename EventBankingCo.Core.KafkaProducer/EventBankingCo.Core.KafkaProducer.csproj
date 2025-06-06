@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Authors>Daniel Aguirre</Authors>
+    <Company>EventBankingCo</Company>
+    <PackageId>EventBankingCo.Core.KafkaProducer</PackageId>
+    <RepositoryUrl>https://github.com/EventBanking/Core</RepositoryUrl>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Confluent.Kafka" Version="2.10.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EventBankingCo.Core.Logging\EventBankingCo.Core.Logging.csproj" />
+  </ItemGroup>
+
+</Project>

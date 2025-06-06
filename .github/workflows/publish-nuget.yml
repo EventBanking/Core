@@ -58,6 +58,14 @@ jobs:
             --no-build \
             --output ./nupkgs \
             /p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }}
+            
+      - name: Pack KafkaProducer project
+        run: |
+          dotnet pack ./EventBankingCo.Core.KafkaProducer/EventBankingCo.Core.KafkaProducer.csproj \
+            --configuration Release \
+            --no-build \
+            --output ./nupkgs \
+            /p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }}
 
       - name: Push packages to NuGet
         run: |
