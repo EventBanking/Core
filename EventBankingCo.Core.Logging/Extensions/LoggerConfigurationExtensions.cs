@@ -34,7 +34,7 @@ namespace EventBankingCo.Core.Logging.Extensions
             {
                 config.WriteTo.Logger(lc => lc
                     .MinimumLevel.ControlledBy(consoleSwitch)
-                    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] ({CorrelationId}) {Message:lj}{NewLine}{Exception}"));
+                    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss.fff} {Level:u3}] CorrelationId: {CorrelationId} | {Message:lj}{NewLine}{Exception}"));
 
             }
 
@@ -44,7 +44,7 @@ namespace EventBankingCo.Core.Logging.Extensions
                     .MinimumLevel.ControlledBy(fileSwitch)
                     .WriteTo.File(
                         options.File.Path,
-                        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] ({CorrelationId}) {Message:lj}{NewLine}{Exception}",
+                        outputTemplate: "[{Timestamp:HH:mm:ss.fff} {Level:u3}] CorrelationId: {CorrelationId} | {Message:lj}{NewLine}{Exception}",
                         rollingInterval: RollingInterval.Day));
             }
 
