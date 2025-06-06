@@ -28,7 +28,7 @@ namespace EventBankingCo.Core.Logging.Extensions
 
             config.ReadFrom.Configuration(configuration)
                   .Enrich.FromLogContext()
-                  .Enrich.With(new LoggingContextEnricher())
+                  .Enrich.With(new LoggingContextEnricher());
 
             if (options.Console.Enabled)
             {
