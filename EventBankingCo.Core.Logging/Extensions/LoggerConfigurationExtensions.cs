@@ -20,21 +20,22 @@ namespace EventBankingCo.Core.Logging.Extensions
             var dbSwitch = new LoggingLevelSwitch(ParseLogLevel(options.Database.MinLevel));
 
             sinkLevelSwitches = new()
-        {
-            { "Console", consoleSwitch },
-            { "File", fileSwitch },
-            { "Database", dbSwitch }
-        };
+            {
+                { "Console", consoleSwitch },
+                { "File", fileSwitch },
+                { "Database", dbSwitch }
+            };
 
             config.ReadFrom.Configuration(configuration)
                   .Enrich.FromLogContext()
-                  .Enrich.With(new LoggingContextEnricher());
+                  .Enrich.With(new LoggingContextEnricher())
 
             if (options.Console.Enabled)
             {
                 config.WriteTo.Logger(lc => lc
                     .MinimumLevel.ControlledBy(consoleSwitch)
-                    .WriteTo.Console());
+                    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] ({CorrelationId}) {Message:lj}{NewLine}{Exception}"));
+
             }
 
             if (options.File.Enabled)
@@ -43,6 +44,7 @@ namespace EventBankingCo.Core.Logging.Extensions
                     .MinimumLevel.ControlledBy(fileSwitch)
                     .WriteTo.File(
                         options.File.Path,
+                        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] ({CorrelationId}) {Message:lj}{NewLine}{Exception}",
                         rollingInterval: RollingInterval.Day));
             }
 
@@ -50,7 +52,7 @@ namespace EventBankingCo.Core.Logging.Extensions
             {
                 config.WriteTo.Logger(lc => lc
                     .MinimumLevel.ControlledBy(dbSwitch)
-                    .WriteTo.MSSqlServer(
+                    .WriteTo.MSSqlServer(                        
                         connectionString: options.Database.ConnectionString,
                         sinkOptions: new Serilog.Sinks.MSSqlServer.MSSqlServerSinkOptions
                         {

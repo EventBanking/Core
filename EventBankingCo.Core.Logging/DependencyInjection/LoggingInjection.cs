@@ -37,12 +37,5 @@ namespace EventBankingCo.Core.Logging.DependencyInjection
             services.AddSingleton<ICoreLogger, CoreLogger>();
             return services;
         }
-
-        public static WebApplication ApplyCoreLogging(this WebApplication app)
-        {
-            app.UseSerilogRequestLogging();
-
-            return app;
-        }
     }
 }
