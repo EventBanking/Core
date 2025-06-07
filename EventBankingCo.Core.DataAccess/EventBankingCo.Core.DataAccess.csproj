@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <Authors>Daniel Aguirre</Authors>
     <Company>EventBankingCo</Company>
-    <PackageId>EventBankingCo.Core.Domain</PackageId>
+    <PackageId>EventBankingCo.Core.DataAccess</PackageId>
     <RepositoryUrl>https://github.com/EventBanking/Core</RepositoryUrl>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
