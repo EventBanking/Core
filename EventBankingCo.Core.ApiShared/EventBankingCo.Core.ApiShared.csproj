@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EventBankingCo.Core.DataAccess\EventBankingCo.Core.DataAccess.csproj" />
+    <ProjectReference Include="..\EventBankingCo.Core.Logging\EventBankingCo.Core.Logging.csproj" />
+    <ProjectReference Include="..\EventBankingCo.Core.RequestHandling\EventBankingCo.Core.RequestHandling.csproj" />
+  </ItemGroup>
+
+</Project>
