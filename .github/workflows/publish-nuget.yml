@@ -67,6 +67,22 @@ jobs:
             --output ./nupkgs \
             /p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }}
             
+        - name: Pack Request Handling project
+        run: |
+          dotnet pack ./EventBankingCo.Core.RequestHandling/EventBankingCo.Core.RequestHandling.csproj \
+            --configuration Release \
+            --no-build \
+            --output ./nupkgs \
+            /p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }}
+                
+        - name: Pack Api Shared project
+        run: |
+          dotnet pack ./EventBankingCo.Core.ApiShared/EventBankingCo.Core.ApiShared.csproj \
+            --configuration Release \
+            --no-build \
+            --output ./nupkgs \
+            /p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }}
+            
       - name: Pack KafkaProducer project
         run: |
           dotnet pack ./EventBankingCo.Core.KafkaProducer/EventBankingCo.Core.KafkaProducer.csproj \
