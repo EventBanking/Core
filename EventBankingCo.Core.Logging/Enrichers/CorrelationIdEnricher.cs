@@ -5,11 +5,11 @@ using System.Diagnostics;
 
 namespace EventBankingCo.Core.Logging.Enrichers
 {
-    public class LoggingContextEnricher : ILogEventEnricher
+    public class CorrelationIdEnricher : ILogEventEnricher
     {
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
-            var correlationId = "N/A";
+            var correlationId = Guid.Empty.ToString();
 
             if (Activity.Current != null)
             {
