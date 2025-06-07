@@ -149,7 +149,7 @@ namespace EventBankingCo.Core.KafkaProducer
 
         #region Protected Virtual Methods - Message Delivery Evaluation And Failure Handling
 
-        protected bool IsMessageDeliverySuccessful(DeliveryResult<TKey, TValue> result, Message<TKey, TValue> message)
+        protected virtual bool IsMessageDeliverySuccessful(DeliveryResult<TKey, TValue> result, Message<TKey, TValue> message)
         {
             switch (result?.Status)
             {
@@ -171,7 +171,7 @@ namespace EventBankingCo.Core.KafkaProducer
             }
         }
 
-        protected Task HandleFinalMessageDeliveryFailureAsync(DeliveryResult<TKey, TValue> result, Message<TKey, TValue> message, int attempt, CancellationToken cancellationToken)
+        protected virtual Task HandleFinalMessageDeliveryFailureAsync(DeliveryResult<TKey, TValue> result, Message<TKey, TValue> message, int attempt, CancellationToken cancellationToken)
         {
             _logger.LogError($"Final attempt to deliver message not successful for topic {Topic} on Partition {Partition} with Key {message.Key} after {attempt} attempts. Last known status: {result?.Status}.");
 
@@ -182,36 +182,36 @@ namespace EventBankingCo.Core.KafkaProducer
 
         #region Protected Virtual Methods - Retriable Exception Handling
 
-        protected Task HandleExceptionBeforeRetryAsync(KafkaRetriableException e, Message<TKey, TValue> message, int attempt, CancellationToken cancellationToken)
+        protected virtual Task HandleExceptionBeforeRetryAsync(KafkaRetriableException e, Message<TKey, TValue> message, int attempt, CancellationToken cancellationToken)
         {
             _logger.LogWarning($"Exception occurred while producing message to topic '{Topic}' on partition {Partition} with key '{message.Key}' on attempt {attempt}. Retrying in {RetryDelayInMilliseconds} milliseconds.", e);
 
             return Task.CompletedTask;
         }
 
-        protected Task HandleFinalRetriableExceptionAsync(KafkaRetriableException e, Message<TKey, TValue> message, int attempt, CancellationToken cancellationToken)
+        protected virtual Task HandleFinalRetriableExceptionAsync(KafkaRetriableException e, Message<TKey, TValue> message, int attempt, CancellationToken cancellationToken)
         {
             _logger.LogError($"Exception occurred on final attempt ({attempt}) to produce message to topic '{Topic}' on partition {Partition} with key '{message.Key}'", e);
 
             return Task.CompletedTask;
         }
 
-        protected bool IsFinalRetriableExceptionThrowable(KafkaRetriableException e) => true;
+        protected virtual bool IsFinalRetriableExceptionThrowable(KafkaRetriableException e) => true;
 
         #endregion
 
         #region Protected Virtual Methods - Non-Retriable Exception Handling
 
-        protected Task HandleNonRetriableExceptionAsync(Exception e, Message<TKey, TValue> message, int attempt, CancellationToken cancellationToken)
+        protected virtual Task HandleNonRetriableExceptionAsync(Exception e, Message<TKey, TValue> message, int attempt, CancellationToken cancellationToken)
         {
             _logger.LogError($"Non-retriable exception occurred while producing message to topic '{Topic}' on partition {Partition} with key '{message.Key}' on attempt {attempt}. Message: {message.Value}", e);
 
             return Task.CompletedTask;
         }
 
-        protected bool IsNonRetriableExceptionThrowable(Exception e) => true;
+        protected virtual bool IsNonRetriableExceptionThrowable(Exception e) => true;
 
-        protected bool StopRetryingOnNonRetriableException(Exception e) => true;
+        protected virtual bool StopRetryingOnNonRetriableException(Exception e) => true;
 
         #endregion
     }
