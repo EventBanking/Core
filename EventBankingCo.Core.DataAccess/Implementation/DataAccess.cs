@@ -50,9 +50,11 @@ namespace EventBankingCo.Core.DataAccess.Implementation
         {
             if (request == null)
             {
-                _logger.LogError("NULL request sent to DataAccess.");
+                var exception = new ArgumentNullException(nameof(request));
 
-                throw new ArgumentNullException(nameof(request));
+                _logger.LogError(exception.Message, exception);
+
+                throw exception;
             }
 
             var requestName = request.GetType().Name;
@@ -108,9 +110,11 @@ namespace EventBankingCo.Core.DataAccess.Implementation
         {
             if (request == null)
             {
-                _logger.LogError("NULL request sent to DataAccess.");
+                var exception = new ArgumentNullException(nameof(request));
 
-                throw new ArgumentNullException(nameof(request));
+                _logger.LogError(exception.Message, exception);
+
+                throw exception;
             }
 
             var requestName = request.GetType().Name;
