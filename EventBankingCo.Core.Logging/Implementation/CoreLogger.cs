@@ -25,14 +25,13 @@ namespace EventBankingCo.Core.Logging.Implementation
         public void LogCritical(string message, Exception? ex = null, object? extra = null, string memberName = "", string filePath = "") => 
             CreateLog(extra, memberName, filePath).Fatal(ex, message);
 
-
         #endregion
 
         #region Private Helper Methods
 
         private ILogger CreateLog(object? extra, string memberName, string filePath) =>
             Log.ForContext("ClassName", Path.GetFileNameWithoutExtension(filePath))
-               .ForContext("MemberName", memberName)
+               .ForContext("MethodName", memberName)
                .ForContext("Extra", extra);
 
         #endregion

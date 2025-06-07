@@ -29,7 +29,7 @@ namespace EventBankingCo.Core.Logging.Implementation
             // Apply Enrichers
             loggerConfig.ReadFrom.Configuration(config)
                 .Enrich.FromLogContext()
-                .Enrich.WithProperty("Microservice", serviceName)
+                .Enrich.WithProperty("ServiceName", serviceName)
                 .Enrich.With(new CorrelationIdEnricher())
                 .Enrich.With(new TraceIdEnricher())
                 .Enrich.WithExceptionDetails();
@@ -61,6 +61,10 @@ namespace EventBankingCo.Core.Logging.Implementation
                 loggingBuilder.AddSerilog(dispose: true);
             });
 
+            // Register ClassEnrichedLogger to capture ClassName for external/3rd parties using ILogger which won't use ICoreLogger
+            services.AddSingleton(typeof(ILogger<>), typeof(ClassEnrichedLogger<>));
+
+            // Register ICoreLogger which should be used instead of ILogger
             services.AddSingleton<ICoreLogger, CoreLogger>();
 
             return services;
