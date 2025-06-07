@@ -1,6 +1,7 @@
 ﻿using EventBankingCo.Core.Logging.Abstraction;
 using EventBankingCo.Core.RequestHandling.Abstraction;
 using System.Collections.Concurrent;
+using System.Linq.Expressions;
 
 namespace EventBankingCo.Core.RequestHandling.Implementation
 {
@@ -12,10 +13,12 @@ namespace EventBankingCo.Core.RequestHandling.Implementation
         // Static cache of compiled delegates
         private static readonly ConcurrentDictionary<Type, Func<object, object, CancellationToken, Task<object>>> _handlerInvokerCache = new();
 
-        public RequestProcessor(IHandlerFactory handlerFactory, ICoreLogger logger)
+        public RequestProcessor(IHandlerFactory handlerFactory, ICoreLogger logger, IHandlerDictionary handlerDictionary)
         {
             _handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            PreloadAllHandlers(handlerDictionary);
         }
 
         public async Task ProcessCommandAsync(ICommand command, CancellationToken cancellationToken) =>
@@ -74,36 +77,87 @@ namespace EventBankingCo.Core.RequestHandling.Implementation
             }
         }
 
+        public void PreloadAllHandlers(IHandlerDictionary handlerDictionary)
+        {
+            foreach (var kvp in handlerDictionary.GetDictionary())
+            {
+                var requestType = kvp.Key;
+                var handlerType = kvp.Value;
+
+                var interfaceType = handlerType
+                    .GetInterfaces()
+                    .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IHandler<,>));
+
+                if (interfaceType == null)
+                    continue;
+
+                var responseType = interfaceType.GetGenericArguments()[1];
+
+                var cacheKey = requestType;
+
+                if (!_handlerInvokerCache.ContainsKey(cacheKey))
+                {
+                    var invoker = BuildHandlerDelegate(handlerType, requestType, responseType);
+                    _handlerInvokerCache.TryAdd(cacheKey, invoker);
+                }
+            }
+
+            _logger.LogInformation($"Preloaded {_handlerInvokerCache.Count} handler delegates.");
+        }
+
+        #region Private Helper Methods - Building Handler Delegate
+
         private Func<object, object, CancellationToken, Task<object>> BuildHandlerDelegate(Type handlerType, Type requestType, Type responseType)
         {
             var interfaceType = typeof(IHandler<,>).MakeGenericType(requestType, responseType);
-            var method = interfaceType.GetMethod("HandleAsync");
-
-            if (method is null)
+            var methodInfo = interfaceType.GetMethod("HandleAsync");
+            if (methodInfo == null)
                 throw new InvalidOperationException($"HandleAsync not found on {interfaceType.Name}");
 
-            return async (handler, request, cancellationToken) =>
-            {
-                // Safe cast using reflection
-                if (!interfaceType.IsInstanceOfType(handler))
-                {
-                    throw new InvalidCastException($"Handler does not implement expected interface {interfaceType.Name}");
-                }
+            // Parameters to the lambda: (object handler, object request, CancellationToken cancellationToken)
+            var handlerParam = Expression.Parameter(typeof(object), "handler");
+            var requestParam = Expression.Parameter(typeof(object), "request");
+            var tokenParam = Expression.Parameter(typeof(CancellationToken), "cancellationToken");
 
-                // Call method via reflection
-                var resultTask = method.Invoke(handler, new object[] { request, cancellationToken }) as Task;
+            // Cast parameters to their actual types
+            var castedHandler = Expression.Convert(handlerParam, interfaceType);
+            var castedRequest = Expression.Convert(requestParam, requestType);
 
-                if (resultTask is null)
-                {
-                    throw new InvalidOperationException($"HandleAsync did not return a Task for {handlerType.Name}");
-                }
+            // Call HandleAsync(castedRequest, cancellationToken)
+            var call = Expression.Call(castedHandler, methodInfo, castedRequest, tokenParam);
 
-                // Get Task<T>.Result
-                var resultProperty = resultTask.GetType().GetProperty("Result");
+            // Convert Task<T> to Task<object>
+            var taskOfResponse = typeof(Task<>).MakeGenericType(responseType);
+            var resultProperty = taskOfResponse.GetProperty("Result");
 
-                return resultProperty?.GetValue(resultTask)!;
-            };
+            // async lambda equivalent:
+            // return await ((Task<T>)call);
+            var lambda = Expression.Lambda<Func<object, object, CancellationToken, Task<object>>>(
+                Expression.Call(
+                    typeof(RequestProcessor),
+                    nameof(CastToTaskObject),
+                    new[] { responseType },
+                    call
+                ),
+                handlerParam,
+                requestParam,
+                tokenParam
+            );
+
+            return lambda.Compile();
         }
 
+        private static async Task<object> CastToTaskObject<T>(Task<T> task)
+        {
+            return await task.ConfigureAwait(false)! ?? default!;
+        }
+
+
+        static class TaskConverter
+        {
+            public static async Task<object> ConvertTaskResult<T>(Task<T> task) => await task.ConfigureAwait(false)! ?? default!;
+        }
+
+        #endregion
     }
 }

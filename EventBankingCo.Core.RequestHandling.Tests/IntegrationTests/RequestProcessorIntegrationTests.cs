@@ -27,7 +27,7 @@ namespace EventBankingCo.Core.RequestHandling.Tests.IntegrationTests
 
             var handlerFactory = new HandlerFactory(typeInstantiator, handlerDictionary, _mockLogger.Object);
 
-            _requestProcessor = new RequestProcessor(handlerFactory, _mockLogger.Object);
+            _requestProcessor = new RequestProcessor(handlerFactory, _mockLogger.Object, handlerDictionary);
         }
 
         [Fact]

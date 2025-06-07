@@ -3,5 +3,7 @@
     public interface IHandlerDictionary
     {
         Type GetHandlerType(Type requestType);
+
+        public Dictionary<Type, Type> GetDictionary();
     }
 }

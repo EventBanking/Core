@@ -12,11 +12,15 @@ namespace EventBankingCo.Core.RequestHandling.Tests.ImplementationTests
 
         private readonly Mock<ICoreLogger> _mockLogger = new();
 
+        private readonly Mock<IHandlerDictionary> _mockHandlerDictionary = new();
+
         private readonly RequestProcessor _processor;
 
         public RequestProcessorTests()
         {
-            _processor = new(_mockHandlerFactory.Object, _mockLogger.Object);
+            _mockHandlerDictionary.Setup(_ => _.GetDictionary()).Returns([]);
+
+            _processor = new(_mockHandlerFactory.Object, _mockLogger.Object, _mockHandlerDictionary.Object);
         }
 
         [Fact]

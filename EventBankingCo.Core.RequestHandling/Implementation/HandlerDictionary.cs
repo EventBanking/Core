@@ -46,6 +46,8 @@ namespace EventBankingCo.Core.RequestHandling.Implementation
             return handlerType;
         }
 
+        public Dictionary<Type, Type> GetDictionary() => this;
+
         #endregion
 
         private static bool ImplementsGenericTypeDefinition(Type? type, Type genericTypeDefinition) =>
