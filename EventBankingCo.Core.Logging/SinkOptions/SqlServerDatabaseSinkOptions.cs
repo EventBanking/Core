@@ -37,8 +37,8 @@ namespace EventBankingCo.Core.Logging.Configurations
                 new SqlColumn("MethodName", SqlDbType.NVarChar),
                 new SqlColumn("CorrelationId", SqlDbType.NVarChar),
                 new SqlColumn("ExceptionType", SqlDbType.NVarChar),
-                new SqlColumn("ExceptionMessage", SqlDbType.Text),
-                new SqlColumn("StackTrace", SqlDbType.Text),
+                new SqlColumn("ExceptionMessage", SqlDbType.NVarChar),
+                new SqlColumn("StackTrace", SqlDbType.NVarChar),
             };
 
             if (additionalColumns != null && additionalColumns.Count > 0)
