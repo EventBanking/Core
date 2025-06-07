@@ -9,7 +9,7 @@ namespace EventBankingCo.Core.Logging.Configurations
 
         private readonly string _topic;
 
-        public KafkaSinkOptions(string servers = "localhost:9092", string topic = "logs", string minLevel = "Information", bool enabled = true) : base(minLevel, enabled)
+        public KafkaSinkOptions(string servers = "localhost:29092", string topic = "logs", string minLevel = "Information", bool enabled = true) : base(minLevel, enabled)
         {
             _servers = servers;
 

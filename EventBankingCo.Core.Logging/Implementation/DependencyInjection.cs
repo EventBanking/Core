@@ -6,12 +6,13 @@ using EventBankingCo.Core.Logging.Abstraction;
 using EventBankingCo.Core.Logging.Implementation;
 using System.Diagnostics;
 using EventBankingCo.Core.Logging.Enrichers;
+using Serilog.Exceptions;
 
-namespace EventBankingCo.Core.Logging.DependencyInjection
+namespace EventBankingCo.Core.Logging.Implementation
 {
-    public static class Logging
+    public static class DependencyInjection
     {
-        public static IServiceCollection AddLogging(this IServiceCollection services, IConfiguration config, params ISinkOption[] sinkOptions)
+        public static IServiceCollection AddLogging(this IServiceCollection services, IConfiguration config, string serviceName, params ISinkOption[] sinkOptions)
         {
             if (services is null)
             {
@@ -28,7 +29,10 @@ namespace EventBankingCo.Core.Logging.DependencyInjection
             // Apply Enrichers
             loggerConfig.ReadFrom.Configuration(config)
                 .Enrich.FromLogContext()
-                .Enrich.With(new CorrelationIdEnricher());
+                .Enrich.WithProperty("Microservice", serviceName)
+                .Enrich.With(new CorrelationIdEnricher())
+                .Enrich.With(new TraceIdEnricher())
+                .Enrich.WithExceptionDetails();
 
             // Apply Sinks
             foreach (var sinkOption in sinkOptions)
@@ -37,7 +41,7 @@ namespace EventBankingCo.Core.Logging.DependencyInjection
                 {
                     // Add sinkOption to services to enable updating LogLevelSwitch at runtime
                     services.AddSingleton(sinkOption);
-                
+
                     loggerConfig.WriteTo.Logger(lc =>
                         sinkOption.ConfigureSink(
                             lc.MinimumLevel.ControlledBy(sinkOption.GetLogLevelSwitch())

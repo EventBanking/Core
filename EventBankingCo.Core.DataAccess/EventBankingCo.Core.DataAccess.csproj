@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Authors>Daniel Aguirre</Authors>
+    <Company>EventBankingCo</Company>
+    <PackageId>EventBankingCo.Core.Domain</PackageId>
+    <RepositoryUrl>https://github.com/EventBanking/Core</RepositoryUrl>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.66" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EventBankingCo.Core.Logging\EventBankingCo.Core.Logging.csproj" />
+  </ItemGroup>
+
+</Project>

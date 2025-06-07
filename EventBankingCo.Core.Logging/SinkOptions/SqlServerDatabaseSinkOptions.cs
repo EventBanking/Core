@@ -1,8 +1,10 @@
 ﻿using Serilog;
+using Serilog.Sinks.MSSqlServer;
+using System.Data;
 
 namespace EventBankingCo.Core.Logging.Configurations
 {
-    public class DatabaseSinkOptions : BaseSinkOption
+    public class SqlServerDatabaseSinkOptions : BaseSinkOption
     {
         private readonly string _connectionString;
 
@@ -12,7 +14,9 @@ namespace EventBankingCo.Core.Logging.Configurations
 
         private readonly TimeSpan _batchPeriod;
 
-        public DatabaseSinkOptions(string connectionString, string tableName = "Logs", string minLevel = "Information", bool enabled = true, int batchPostingLimit = 1000, int secondsBetweenBatches = 5) : base(minLevel, enabled)
+        private readonly List<SqlColumn> _additionalColumns;
+
+        public SqlServerDatabaseSinkOptions(string connectionString, string tableName = "Logs", string minLevel = "Information", bool enabled = true, int batchPostingLimit = 1000, int secondsBetweenBatches = 5, List<SqlColumn>? additionalColumns = null) : base(minLevel, enabled)
         {
             _connectionString = !string.IsNullOrWhiteSpace(connectionString) ? connectionString :
                 throw new ArgumentNullException(nameof(connectionString), "Connection string cannot be null or empty.");
@@ -25,11 +29,27 @@ namespace EventBankingCo.Core.Logging.Configurations
 
             _batchPeriod = secondsBetweenBatches > 0 ? TimeSpan.FromSeconds(secondsBetweenBatches) :
                 throw new ArgumentOutOfRangeException(nameof(secondsBetweenBatches), "Seconds between batches must be greater than zero.");
+
+            _additionalColumns = new List<SqlColumn>()
+            {
+                new SqlColumn("TraceId",SqlDbType.NVarChar),
+                new SqlColumn("ClassName", SqlDbType.NVarChar),
+                new SqlColumn("MethodName", SqlDbType.NVarChar),
+                new SqlColumn("CorrelationId", SqlDbType.NVarChar),
+                new SqlColumn("ExceptionType", SqlDbType.NVarChar),
+                new SqlColumn("ExceptionMessage", SqlDbType.Text),
+                new SqlColumn("StackTrace", SqlDbType.Text),
+            };
+
+            if (additionalColumns != null && additionalColumns.Count > 0)
+            {
+                _additionalColumns.AddRange(additionalColumns);
+            }
         }
 
         public override LoggerConfiguration ConfigureSink(LoggerConfiguration loggerConfig) =>
             loggerConfig.WriteTo.MSSqlServer(_connectionString,
-                sinkOptions: new Serilog.Sinks.MSSqlServer.MSSqlServerSinkOptions
+                sinkOptions: new MSSqlServerSinkOptions
                 {
                     TableName = _tableName,
                     AutoCreateSqlTable = true,
