@@ -54,8 +54,11 @@ namespace EventBankingCo.Core.Logging.Configurations
                     TableName = _tableName,
                     AutoCreateSqlTable = true,
                     BatchPostingLimit = _batchPostingLimit,
-                    BatchPeriod = _batchPeriod
-                }
-            );
+                    BatchPeriod = _batchPeriod,                    
+                },
+                columnOptions: new ColumnOptions()
+                {
+                    AdditionalColumns = _additionalColumns,
+                });
     }
 }
