@@ -59,6 +59,14 @@ jobs:
             --output ./nupkgs \
             /p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }}
             
+      - name: Pack Data Access project
+        run: |
+          dotnet pack ./EventBankingCo.Core.DataAccess/EventBankingCo.Core.DataAccess.csproj \
+            --configuration Release \
+            --no-build \
+            --output ./nupkgs \
+            /p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }}
+            
       - name: Pack KafkaProducer project
         run: |
           dotnet pack ./EventBankingCo.Core.KafkaProducer/EventBankingCo.Core.KafkaProducer.csproj \
