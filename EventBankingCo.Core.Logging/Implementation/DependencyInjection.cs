@@ -62,6 +62,8 @@ namespace EventBankingCo.Core.Logging.Implementation
                 loggingBuilder.AddSerilog(dispose: true);
             });
 
+            services.AddSingleton<ICoreLoggerFactory, CoreLoggerFactory>();
+
             services.AddSingleton(typeof(ICoreLogger<>), typeof(CoreLogger<>));
 
             return services;
