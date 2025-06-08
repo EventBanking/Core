@@ -2,6 +2,6 @@
 {
     public interface IHandlerFactory
     {
-         public object CreateHandler<TRequest, TResponse>(TRequest request) where TRequest : IRequest<TResponse>;
+         public object CreateHandler<TRequest>(TRequest request);
     }
 }

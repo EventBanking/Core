@@ -25,7 +25,7 @@ namespace EventBankingCo.Core.RequestHandling.Tests.IntegrationTests
 
             var handlerFactory = new HandlerFactory(typeInstantiator, handlerDictionary, new Mock<ICoreLogger<HandlerFactory>>().Object);
 
-            _requestProcessor = new RequestProcessor(handlerFactory, new Mock<ICoreLogger<RequestProcessor>>().Object, handlerDictionary);
+            _requestProcessor = new RequestProcessor(handlerFactory, new Mock<ICoreLogger<RequestProcessor>>().Object);
         }
 
         [Fact]
@@ -35,7 +35,7 @@ namespace EventBankingCo.Core.RequestHandling.Tests.IntegrationTests
             var request = new TestRequest();
 
             // Act
-            var result = await _requestProcessor.ProcessRequestAsync(request);
+            var result = await _requestProcessor.GetResponseAsync(request);
 
             // Assert
             Assert.Equal(request.ResultValue, result);
@@ -48,7 +48,7 @@ namespace EventBankingCo.Core.RequestHandling.Tests.IntegrationTests
             TestRequest? request = null;
 
             // Act & Assert
-            var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await _requestProcessor.ProcessRequestAsync(request!));
+            var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await _requestProcessor.GetResponseAsync(request!));
 
             Assert.Equal("request", exception.ParamName);
         }
@@ -58,7 +58,7 @@ namespace EventBankingCo.Core.RequestHandling.Tests.IntegrationTests
         {
             Mock<IRequest<string>> mockRequest = new();
 
-            var exception = await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _requestProcessor.ProcessRequestAsync(mockRequest.Object));
+            var exception = await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _requestProcessor.GetResponseAsync(mockRequest.Object));
 
             Assert.Contains("No handler found for request type", exception.Message);
         }
@@ -70,7 +70,7 @@ namespace EventBankingCo.Core.RequestHandling.Tests.IntegrationTests
             ICommand? command = null;
 
             // Act & Assert
-            var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await _requestProcessor.ProcessCommandAsync(command!, CancellationToken.None));
+            var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await _requestProcessor.ExecuteCommandAsync(command!, CancellationToken.None));
 
             Assert.Equal("request", exception.ParamName);
         }
@@ -82,7 +82,7 @@ namespace EventBankingCo.Core.RequestHandling.Tests.IntegrationTests
             Mock<ICommand> mockCommand = new();
 
             // Act & Assert
-            var exception = await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _requestProcessor.ProcessCommandAsync(mockCommand.Object, CancellationToken.None));
+            var exception = await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _requestProcessor.ExecuteCommandAsync(mockCommand.Object, CancellationToken.None));
 
             Assert.Contains("No handler found for request type", exception.Message);
         }
@@ -94,7 +94,7 @@ namespace EventBankingCo.Core.RequestHandling.Tests.IntegrationTests
             var command = new TestCommand();
 
             // Act
-            var exception = await Record.ExceptionAsync(async () => await _requestProcessor.ProcessCommandAsync(command, CancellationToken.None));
+            var exception = await Record.ExceptionAsync(async () => await _requestProcessor.ExecuteCommandAsync(command, CancellationToken.None));
 
             // Assert
             Assert.Null(exception);

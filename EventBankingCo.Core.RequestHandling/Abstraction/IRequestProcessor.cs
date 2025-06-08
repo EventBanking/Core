@@ -2,6 +2,8 @@
 {
     public interface IRequestProcessor
     {
-        Task<TResponse> ProcessRequestAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default);
+        Task ExecuteCommandAsync(ICommand command, CancellationToken cancellationToken);
+
+        Task <TResponse> GetResponseAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default);
     }
 }

@@ -1,8 +1,7 @@
 ﻿namespace EventBankingCo.Core.RequestHandling.Abstraction
 {
-    internal interface IHandler<in TRequest, TResponse> where TRequest : IRequest<TResponse>
+    public interface IHandler
     {
-        Task<TResponse> HandleAsync(TRequest request, CancellationToken cancellationToken = default);
+        Task<object?> HandleAsync(object request, CancellationToken cancellationToken = default);
     }
-
 }

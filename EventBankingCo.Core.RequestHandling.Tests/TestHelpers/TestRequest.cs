@@ -2,7 +2,7 @@
 
 namespace EventBankingCo.Core.RequestHandling.Tests.TestHelpers
 {
-    class TestRequest : IRequest<string>
+    public class TestRequest : IRequest<string>
     {
         public TestRequest(string value = "TestValue")
         {

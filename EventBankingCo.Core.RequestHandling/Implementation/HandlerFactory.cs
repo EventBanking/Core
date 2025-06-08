@@ -30,7 +30,7 @@ namespace EventBankingCo.Core.RequestHandling.Implementation
 
         #region Public Method
 
-        public object CreateHandler<TRequest, TResponse>(TRequest request) where TRequest : IRequest<TResponse>
+        public object CreateHandler<TRequest>(TRequest request)
         {
             if (request is null)
             {

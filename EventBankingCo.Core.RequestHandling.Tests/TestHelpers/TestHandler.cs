@@ -1,10 +1,13 @@
-﻿using EventBankingCo.Core.RequestHandling.Abstraction;
+﻿using EventBankingCo.Core.Logging.Abstraction;
+using EventBankingCo.Core.RequestHandling.Base;
 
 namespace EventBankingCo.Core.RequestHandling.Tests.TestHelpers
 {
-    internal class TestHandler : IHandler<TestRequest, string>
+    public class TestHandler : RequestHandler<TestRequest, string>
     {
-        public Task<string> HandleAsync(TestRequest request, CancellationToken cancellationToken = default)
+        public TestHandler(ICoreLoggerFactory loggerFactory) : base(loggerFactory) { }
+
+        protected override Task<string> GetResponseAsync(TestRequest request, CancellationToken cancellationToken)
         {
             return Task.FromResult(request.ResultValue);
         }

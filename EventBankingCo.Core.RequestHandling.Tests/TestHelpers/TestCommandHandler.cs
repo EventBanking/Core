@@ -7,7 +7,7 @@ namespace EventBankingCo.Core.RequestHandling.Tests.TestHelpers
     {
         public TestCommandHandler(ICoreLoggerFactory logger) : base(logger) { }
 
-        protected override Task ProcessCommandAsync(TestCommand request)
+        protected override Task ExecuteCommandAsync(TestCommand request, CancellationToken cancellationToken)
         {
             _logger.LogTrace(request.ValueToTrace);
 

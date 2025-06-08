@@ -12,15 +12,11 @@ namespace EventBankingCo.Core.RequestHandling.Tests.ImplementationTests
 
         private readonly Mock<ICoreLogger<RequestProcessor>> _mockLogger = new();
 
-        private readonly Mock<IHandlerDictionary> _mockHandlerDictionary = new();
-
         private readonly RequestProcessor _processor;
 
         public RequestProcessorTests()
         {
-            _mockHandlerDictionary.Setup(_ => _.GetDictionary()).Returns([]);
-
-            _processor = new(_mockHandlerFactory.Object, _mockLogger.Object, _mockHandlerDictionary.Object);
+            _processor = new(_mockHandlerFactory.Object, _mockLogger.Object);
         }
 
         [Fact]
@@ -29,7 +25,7 @@ namespace EventBankingCo.Core.RequestHandling.Tests.ImplementationTests
             // Arrange
             IRequest<string>? request = null;
 
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await _processor.ProcessRequestAsync(request!));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await _processor.GetResponseAsync(request!));
         }
 
         [Fact]
@@ -38,7 +34,7 @@ namespace EventBankingCo.Core.RequestHandling.Tests.ImplementationTests
             // Arrange
             IRequest<string>? request = null;
 
-            var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await _processor.ProcessRequestAsync(request!));
+            var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await _processor.GetResponseAsync(request!));
 
             _mockLogger.Verify(logger => logger.LogError(exception.Message, exception, null, It.IsAny<string>()), Times.Once);
         }
@@ -48,29 +44,16 @@ namespace EventBankingCo.Core.RequestHandling.Tests.ImplementationTests
         {
             // Arrange
             var request = new TestRequest();
-            var handler = new TestHandler();
+            var handler = new TestHandler(new CoreLoggingFactoryStub());
 
-            _mockHandlerFactory.Setup(hf => hf.CreateHandler<IRequest<string>, string>(request)).Returns(handler);
+            _mockHandlerFactory.Setup(hf => hf.CreateHandler(It.Is<object>(_ => _.GetType() == typeof(TestRequest)))).Returns(handler);
+            //_mockHandlerFactory.Setup(hf => hf.CreateHandler(It.IsAny<object>())).Returns(handler);
 
             // Act
-            var result = await _processor.ProcessRequestAsync(request);
+            var result = await _processor.GetResponseAsync(request);
 
             // Assert
             Assert.Equal(request.ResultValue, result);
-        }
-
-        [Fact]
-        public async Task ProcessAsync_ShouldThrowInvalidOperationException_WhenNoHandlerFound()
-        {
-            // Arrange
-            var request = new TestRequest();
-
-            _mockHandlerFactory.Setup(hf => hf.CreateHandler<IRequest<string>, string>(request)).Returns((TestHandler?)null!);
-
-            // Act & Assert
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () => await _processor.ProcessRequestAsync(request));
-
-            _mockLogger.Verify(logger => logger.LogError(exception.Message, exception, null, It.IsAny<string>()), Times.Once);
         }
     }
 }

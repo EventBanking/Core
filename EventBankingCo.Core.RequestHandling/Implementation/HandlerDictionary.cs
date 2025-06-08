@@ -1,4 +1,5 @@
 ﻿using EventBankingCo.Core.RequestHandling.Abstraction;
+using EventBankingCo.Core.RequestHandling.Base;
 
 namespace EventBankingCo.Core.RequestHandling.Implementation
 {
@@ -10,7 +11,7 @@ namespace EventBankingCo.Core.RequestHandling.Implementation
         {
             var dictionary = new HandlerDictionary();
 
-            var handlerType = typeof(IHandler<,>);
+            var handlerType = typeof(IRequestHandler<>);
             var handlerDefinition = handlerType.GetGenericTypeDefinition();
 
             foreach (var type in typeof(T).Assembly.GetTypes())
@@ -19,7 +20,7 @@ namespace EventBankingCo.Core.RequestHandling.Implementation
                 {
                     if (ImplementsGenericTypeDefinition(type, handlerDefinition))
                     {
-                        var requestType = type.GetInterface(handlerType.Name)!.GenericTypeArguments.First();
+                        var requestType = type.GetInterface(handlerType.Name)!.GenericTypeArguments.Single();
                     
                         dictionary.Add(requestType, type);
                     }

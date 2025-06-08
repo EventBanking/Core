@@ -3,33 +3,19 @@ using EventBankingCo.Core.RequestHandling.Abstraction;
 
 namespace EventBankingCo.Core.RequestHandling.Base
 {
-    public abstract class RequestHandler<TRequest, TResponse> : IHandler<TRequest, TResponse> where TRequest : IRequest<TResponse>
+    public abstract class RequestHandler<TRequest, TResponse> : CoreHandler<TRequest, TResponse> where TRequest : IRequest<TResponse>
     {
-        protected readonly ICoreLogger<RequestHandler<TRequest,TResponse>> _logger;
+        public RequestHandler(ICoreLoggerFactory loggerFactory) : base(loggerFactory) { }
 
-        protected RequestHandler(ICoreLoggerFactory loggerFactory)
+        protected abstract Task<TResponse> GetResponseAsync(TRequest request, CancellationToken cancellationToken);
+
+        protected override async Task<TResponse> ProcessRequestAsync(TRequest request, CancellationToken cancellationToken)
         {
-            _logger = loggerFactory.Create(this);
-        }
+            _logger.LogDebug($"Receiving Request", request);
 
-        protected abstract Task<TResponse> ProcessRequestAsync(TRequest request, CancellationToken cancellationToken);
+            var response = await GetResponseAsync(request, cancellationToken);
 
-        public async Task<TResponse> HandleAsync(TRequest request, CancellationToken cancellationToken = default)
-        {
-            if (request is null)
-            {
-                var exception = new ArgumentNullException(nameof(request), "Request cannot be null.");
-
-                _logger.LogError(exception.Message, exception);
-
-                throw exception;
-            }
-
-            _logger.LogInformation($"Handling Request: {request.GetType().Name}");
-
-            var response = await ProcessRequestAsync(request, cancellationToken);
-
-            _logger.LogInformation($"Handled Request: {request.GetType().Name} with Response: {response?.GetType().Name}");
+            _logger.LogDebug("Request Handled", response);
 
             return response;
         }

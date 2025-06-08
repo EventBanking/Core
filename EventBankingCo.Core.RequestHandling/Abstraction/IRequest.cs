@@ -1,4 +1,4 @@
 ﻿namespace EventBankingCo.Core.RequestHandling.Abstraction
 {
-    public interface ICommand { }
+    public interface IRequest<TResponse> { }
 }
