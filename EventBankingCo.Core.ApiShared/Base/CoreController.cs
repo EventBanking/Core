@@ -9,9 +9,9 @@ namespace EventBankingCo.Core.ApiShared.Base
 
         protected readonly IRequestProcessor _requestProcessor;
 
-        public CoreController(ICoreLogger<CoreController> logger, IRequestProcessor requestProccessor)
+        public CoreController(ICoreLoggerFactory loggerFactory, IRequestProcessor requestProccessor)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger), "Logger cannot be null");
+            _logger = loggerFactory.Create(this);
 
             _requestProcessor = requestProccessor ?? throw new ArgumentNullException(nameof(requestProccessor), "Request Processor cannot be null");
         }
