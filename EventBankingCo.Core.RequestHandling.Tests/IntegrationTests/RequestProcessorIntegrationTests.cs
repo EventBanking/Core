@@ -11,23 +11,21 @@ namespace EventBankingCo.Core.RequestHandling.Tests.IntegrationTests
     {
         private readonly RequestProcessor _requestProcessor;
 
-        private readonly Mock<ICoreLogger> _mockLogger = new();
-
         public RequestProcessorIntegrationTests()
         {
             var handlerDictionary = HandlerDictionary.FromAssemblyOf<TestRequest>();
 
             var serviceCollection = new ServiceCollection();
 
-            serviceCollection.AddSingleton(_mockLogger.Object);
+            serviceCollection.AddSingleton<ICoreLoggerFactory, CoreLoggingFactoryStub>();
 
             serviceCollection.AddRequestHandling(handlerDictionary);
 
-            var typeInstantiator = new TypeInstantiator(serviceCollection.BuildServiceProvider(), _mockLogger.Object);
+            var typeInstantiator = new TypeInstantiator(serviceCollection.BuildServiceProvider(), new Mock<ICoreLogger<TypeInstantiator>>().Object);
 
-            var handlerFactory = new HandlerFactory(typeInstantiator, handlerDictionary, _mockLogger.Object);
+            var handlerFactory = new HandlerFactory(typeInstantiator, handlerDictionary, new Mock<ICoreLogger<HandlerFactory>>().Object);
 
-            _requestProcessor = new RequestProcessor(handlerFactory, _mockLogger.Object, handlerDictionary);
+            _requestProcessor = new RequestProcessor(handlerFactory, new Mock<ICoreLogger<RequestProcessor>>().Object, handlerDictionary);
         }
 
         [Fact]

@@ -62,8 +62,7 @@ namespace EventBankingCo.Core.Logging.Implementation
                 loggingBuilder.AddSerilog(dispose: true);
             });
 
-            // Register ICoreLogger which should be used instead of ILogger
-            services.AddSingleton<ICoreLogger, CoreLogger>();
+            services.AddSingleton(typeof(ICoreLogger<>), typeof(CoreLogger<>));
 
             return services;
         }

@@ -9,9 +9,9 @@ namespace EventBankingCo.Core.DataAccess.Implementation
     {
         private readonly IDbConnectionFactory _dbConnectionFactory;
 
-        private readonly ICoreLogger _logger;
+        private readonly ICoreLogger<DataAccess> _logger;
 
-        public DataAccess(IDbConnectionFactory dbConnectionFactory, ICoreLogger logger)
+        public DataAccess(IDbConnectionFactory dbConnectionFactory, ICoreLogger<DataAccess> logger)
         {
             _dbConnectionFactory = dbConnectionFactory ?? throw new ArgumentNullException(nameof(dbConnectionFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

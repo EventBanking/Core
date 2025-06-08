@@ -14,7 +14,7 @@ namespace EventBankingCo.Core.RequestHandling.Tests.ImplementationTests
 
         private readonly Mock<ITypeInstantiator> _mockTypeActivator = new();
 
-        private readonly Mock<ICoreLogger> _mockLogger = new();
+        private readonly Mock<ICoreLogger<HandlerFactory>> _mockLogger = new();
 
         public HandlerFactoryTests()
         {

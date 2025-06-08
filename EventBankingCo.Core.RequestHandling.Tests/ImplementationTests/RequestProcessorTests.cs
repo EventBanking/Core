@@ -10,7 +10,7 @@ namespace EventBankingCo.Core.RequestHandling.Tests.ImplementationTests
     {
         private readonly Mock<IHandlerFactory> _mockHandlerFactory = new();
 
-        private readonly Mock<ICoreLogger> _mockLogger = new();
+        private readonly Mock<ICoreLogger<RequestProcessor>> _mockLogger = new();
 
         private readonly Mock<IHandlerDictionary> _mockHandlerDictionary = new();
 
@@ -40,7 +40,7 @@ namespace EventBankingCo.Core.RequestHandling.Tests.ImplementationTests
 
             var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () => await _processor.ProcessRequestAsync(request!));
 
-            _mockLogger.Verify(logger => logger.LogError(exception.Message, exception, null, It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _mockLogger.Verify(logger => logger.LogError(exception.Message, exception, null, It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -70,7 +70,7 @@ namespace EventBankingCo.Core.RequestHandling.Tests.ImplementationTests
             // Act & Assert
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () => await _processor.ProcessRequestAsync(request));
 
-            _mockLogger.Verify(logger => logger.LogError(exception.Message, exception, null, It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _mockLogger.Verify(logger => logger.LogError(exception.Message, exception, null, It.IsAny<string>()), Times.Once);
         }
     }
 }

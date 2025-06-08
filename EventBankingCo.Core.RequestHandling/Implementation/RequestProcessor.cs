@@ -8,12 +8,12 @@ namespace EventBankingCo.Core.RequestHandling.Implementation
     public class RequestProcessor : IRequestProcessor
     {
         private readonly IHandlerFactory _handlerFactory;
-        private readonly ICoreLogger _logger;
+        private readonly ICoreLogger<RequestProcessor> _logger;
 
         // Static cache of compiled delegates
         private static readonly ConcurrentDictionary<Type, Func<object, object, CancellationToken, Task<object>>> _handlerInvokerCache = new();
 
-        public RequestProcessor(IHandlerFactory handlerFactory, ICoreLogger logger, IHandlerDictionary handlerDictionary)
+        public RequestProcessor(IHandlerFactory handlerFactory, ICoreLogger<RequestProcessor> logger, IHandlerDictionary handlerDictionary)
         {
             _handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

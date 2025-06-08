@@ -33,7 +33,6 @@ namespace EventBankingCo.Core.Logging.Configurations
             _additionalColumns = new List<SqlColumn>()
             {
                 new SqlColumn("TraceId",SqlDbType.NVarChar),
-                new SqlColumn("ClassName", SqlDbType.NVarChar),
                 new SqlColumn("MethodName", SqlDbType.NVarChar),
                 new SqlColumn("CorrelationId", SqlDbType.NVarChar),
                 new SqlColumn("ExceptionType", SqlDbType.NVarChar),

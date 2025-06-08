@@ -5,11 +5,11 @@ namespace EventBankingCo.Core.ApiShared.Base
 {
     public class CoreController
     {
-        protected readonly ICoreLogger _logger;
+        protected readonly ICoreLogger<CoreController> _logger;
 
         protected readonly IRequestProcessor _requestProcessor;
 
-        public CoreController(ICoreLogger logger, IRequestProcessor requestProccessor)
+        public CoreController(ICoreLogger<CoreController> logger, IRequestProcessor requestProccessor)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger), "Logger cannot be null");
 

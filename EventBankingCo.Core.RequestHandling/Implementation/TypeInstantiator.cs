@@ -13,9 +13,9 @@ namespace EventBankingCo.Core.RequestHandling.Implementation
     {
         private readonly IServiceProvider _serviceProvider;
 
-        private readonly ICoreLogger _logger;
+        private readonly ICoreLogger<TypeInstantiator> _logger;
 
-        public TypeInstantiator(IServiceProvider serviceProvider, ICoreLogger logger)
+        public TypeInstantiator(IServiceProvider serviceProvider, ICoreLogger<TypeInstantiator> logger)
         {
             _serviceProvider = serviceProvider;
 

@@ -11,13 +11,13 @@ namespace EventBankingCo.Core.RequestHandling.Implementation
 
         private readonly ITypeInstantiator _typeActivator;
 
-        private readonly ICoreLogger _logger;
+        private readonly ICoreLogger<HandlerFactory> _logger;
 
         #endregion
 
         #region Constructor
 
-        public HandlerFactory(ITypeInstantiator typeActivator, IHandlerDictionary handlers, ICoreLogger logger)
+        public HandlerFactory(ITypeInstantiator typeActivator, IHandlerDictionary handlers, ICoreLogger<HandlerFactory> logger)
         {
             _typeActivator = typeActivator;
 

@@ -3,34 +3,34 @@ using Serilog;
 
 namespace EventBankingCo.Core.Logging.Implementation
 {
-    public class CoreLogger : ICoreLogger
+    public class CoreLogger<T> : ICoreLogger<T>
     {
         #region ICoreLogger Implementation
 
-        public void LogTrace(string message, object? extra = null, string memberName = "", string filePath = "") =>
-            CreateLog(extra, memberName, filePath).Verbose(message);
+        public void LogTrace(string message, object? extra = null, string memberName = "") =>
+            CreateLog(extra, memberName).Verbose(message);
 
-        public void LogDebug(string message, object? extra = null, string memberName = "", string filePath = "") =>
-            CreateLog(extra, memberName, filePath).Debug(message);
+        public void LogDebug(string message, object? extra = null, string memberName = "") =>
+            CreateLog(extra, memberName).Debug(message);
 
-        public void LogInformation(string message, object? extra, string memberName = "", string filePath = "") =>
-            CreateLog(extra, memberName, filePath).Information(message);
+        public void LogInformation(string message, object? extra, string memberName = "") =>
+            CreateLog(extra, memberName).Information(message);
 
-        public void LogWarning(string message, Exception? ex = null, object? extra = null, string memberName = "", string filePath = "") =>
-            CreateLog(extra, memberName, filePath).Warning(ex, message);
+        public void LogWarning(string message, Exception? ex = null, object? extra = null, string memberName = "") =>
+            CreateLog(extra, memberName).Warning(ex, message);
 
-        public void LogError(string message, Exception? ex = null, object? extra = null, string memberName = "", string filePath = "") =>
-            CreateLog(extra, memberName, filePath).Error(ex, message);
+        public void LogError(string message, Exception? ex = null, object? extra = null, string memberName = "") =>
+            CreateLog(extra, memberName).Error(ex, message);
 
-        public void LogCritical(string message, Exception? ex = null, object? extra = null, string memberName = "", string filePath = "") => 
-            CreateLog(extra, memberName, filePath).Fatal(ex, message);
+        public void LogCritical(string message, Exception? ex = null, object? extra = null, string memberName = "") => 
+            CreateLog(extra, memberName).Fatal(ex, message);
 
         #endregion
 
         #region Private Helper Methods
 
-        private ILogger CreateLog(object? extra, string memberName, string filePath) =>
-            Log.ForContext("ClassName", Path.GetFileNameWithoutExtension(filePath))
+        private ILogger CreateLog(object? extra, string memberName) =>
+            Log.ForContext("SourceContext", typeof(T).FullName)
                .ForContext("MethodName", memberName)
                .ForContext("Extra", extra);
 

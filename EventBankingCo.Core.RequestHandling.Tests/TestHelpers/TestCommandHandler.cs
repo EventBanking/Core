@@ -5,7 +5,7 @@ namespace EventBankingCo.Core.RequestHandling.Tests.TestHelpers
 {
     public class TestCommandHandler : CommandHandler<TestCommand>
     {
-        public TestCommandHandler(ICoreLogger logger) : base(logger) { }
+        public TestCommandHandler(ICoreLoggerFactory logger) : base(logger) { }
 
         protected override Task ProcessCommandAsync(TestCommand request)
         {
