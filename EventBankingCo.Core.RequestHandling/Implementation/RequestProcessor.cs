@@ -66,9 +66,9 @@ namespace EventBankingCo.Core.RequestHandling.Implementation
             {
                 var response = await invoker.Invoke(handler, request, cancellationToken);
 
-                _logger.LogInformation($"Request: {requestType.Name} processed successfully");
+                _logger.LogInformation($"Request: {requestType.Name} processed successfully. Response: {response?.GetType().Name ?? "NULL"}");
 
-                return (TResponse)response;
+                return (TResponse)response!;
             }
             catch (Exception ex)
             {

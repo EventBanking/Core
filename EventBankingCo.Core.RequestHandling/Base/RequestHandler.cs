@@ -1,5 +1,4 @@
-﻿using Azure;
-using EventBankingCo.Core.Logging.Abstraction;
+﻿using EventBankingCo.Core.Logging.Abstraction;
 using EventBankingCo.Core.RequestHandling.Abstraction;
 
 namespace EventBankingCo.Core.RequestHandling.Base
@@ -13,7 +12,7 @@ namespace EventBankingCo.Core.RequestHandling.Base
             _logger = loggerFactory.Create(this);
         }
 
-        protected abstract Task<TResponse> ProcessRequestAsync(TRequest request);
+        protected abstract Task<TResponse> ProcessRequestAsync(TRequest request, CancellationToken cancellationToken);
 
         public async Task<TResponse> HandleAsync(TRequest request, CancellationToken cancellationToken = default)
         {
@@ -28,7 +27,7 @@ namespace EventBankingCo.Core.RequestHandling.Base
 
             _logger.LogInformation($"Handling Request: {request.GetType().Name}");
 
-            var response = await ProcessRequestAsync(request);
+            var response = await ProcessRequestAsync(request, cancellationToken);
 
             _logger.LogInformation($"Handled Request: {request.GetType().Name} with Response: {response?.GetType().Name}");
 

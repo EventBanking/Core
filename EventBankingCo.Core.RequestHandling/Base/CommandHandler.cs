@@ -14,7 +14,7 @@ namespace EventBankingCo.Core.RequestHandling.Base
             _logger = logger;
         }
 
-        protected abstract Task ProcessCommandAsync(TRequest request);
+        protected abstract Task ProcessCommandAsync(TRequest request, CancellationToken cancellationToken);
 
         public async Task<object?> HandleAsync(TRequest request, CancellationToken cancellationToken = default)
         {
@@ -29,7 +29,7 @@ namespace EventBankingCo.Core.RequestHandling.Base
 
             _logger.LogInformation($"Handling Request: {request.GetType().Name}");
 
-            await ProcessCommandAsync(request);
+            await ProcessCommandAsync(request, cancellationToken);
 
             _logger.LogInformation($"Handled Request: {request.GetType().Name}");
 
