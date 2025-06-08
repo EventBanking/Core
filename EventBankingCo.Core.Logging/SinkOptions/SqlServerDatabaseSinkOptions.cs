@@ -40,6 +40,7 @@ namespace EventBankingCo.Core.Logging.Configurations
                 new SqlColumn("ExceptionMessage", SqlDbType.NVarChar),
                 new SqlColumn("StackTrace", SqlDbType.NVarChar),
                 new SqlColumn("ServiceName", SqlDbType.NVarChar),
+                new SqlColumn("SourceContext", SqlDbType.NVarChar),
             };
 
             if (additionalColumns != null && additionalColumns.Count > 0)
