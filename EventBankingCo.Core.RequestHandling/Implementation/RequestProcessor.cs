@@ -16,7 +16,7 @@ namespace EventBankingCo.Core.RequestHandling.Implementation
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task ExecuteCommandAsync(ICommand command, CancellationToken cancellationToken) =>
+        public async Task ExecuteCommandAsync(ICommand command, CancellationToken cancellationToken = default) =>
             await ProcessAsync<object>(command, cancellationToken);
 
         public async Task<TResponse> GetResponseAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default) =>

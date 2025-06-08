@@ -1,4 +1,4 @@
-﻿namespace EventBankingCo.Core.Domain.Models
+﻿namespace EventBankingCo.Core.Domain.Models.Logging
 {
     public class LogMessage
     {
@@ -9,7 +9,7 @@
         public string Level { get; set; } = string.Empty;
 
         public string? ServiceName { get; set; }
-        
+
         public string? SourceContext { get; set; }
 
         public string? MethodName { get; set; }
@@ -19,7 +19,7 @@
         public string? CorrelationId { get; set; }
 
         public string? Message { get; set; } = string.Empty;
-        
+
         public string? Extra { get; set; } = string.Empty;
 
         public string? ExceptionType { get; set; }
