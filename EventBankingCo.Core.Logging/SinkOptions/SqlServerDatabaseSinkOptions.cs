@@ -59,6 +59,7 @@ namespace EventBankingCo.Core.Logging.Configurations
                     AutoCreateSqlTable = true,
                     BatchPostingLimit = _batchPostingLimit,
                     BatchPeriod = _batchPeriod,                    
+                    LevelSwitch = GetLogLevelSwitch(),
                 },
                 columnOptions: new ColumnOptions()
                 {

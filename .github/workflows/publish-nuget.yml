@@ -3,18 +3,18 @@ name: Publish NuGet Packages
 on:
   push:
     branches:
-      - main  # Triggers when PRs are merged into main
+      - main
 
 jobs:
   publish:
-    name: Build and Publish Core NuGet Packages
     runs-on: ubuntu-latest
+    name: Build and Publish Changed NuGet Packages
 
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Required for GitVersion to work properly
+          fetch-depth: 0
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
@@ -30,12 +30,23 @@ jobs:
         id: gitversion
         uses: gittools/actions/gitversion/execute@v1
         with:
-          useConfigFile: true  # Ensures it uses GitVersion.yml if present
+          useConfigFile: true
 
       - name: Output GitVersion Information
         run: |
           echo "FullSemVer: ${{ steps.gitversion.outputs.fullSemVer }}"
           echo "NuGet Version: ${{ steps.gitversion.outputs.nuGetVersionV2 }}"
+
+      - name: Get changed projects
+        id: changes
+        run: |
+          echo "Changed projects:"
+          git fetch origin main
+          CHANGED=$(git diff --name-only origin/main...HEAD | grep '\.csproj$' || true)
+          echo "$CHANGED"
+          echo "changed_projects<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Restore dependencies
         run: dotnet restore EventBankingCo.Core.sln
@@ -43,57 +54,26 @@ jobs:
       - name: Build solution
         run: dotnet build EventBankingCo.Core.sln --configuration Release --no-restore
 
-      - name: Pack Domain project
+      - name: Pack Changed Projects
         run: |
-          dotnet pack ./EventBankingCo.Core.Domain/EventBankingCo.Core.Domain.csproj \
-            --configuration Release \
-            --no-build \
-            --output ./nupkgs \
-            /p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }}
-
-      - name: Pack Logging project
-        run: |
-          dotnet pack ./EventBankingCo.Core.Logging/EventBankingCo.Core.Logging.csproj \
-            --configuration Release \
-            --no-build \
-            --output ./nupkgs \
-            /p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }}
-            
-      - name: Pack Data Access project
-        run: |
-          dotnet pack ./EventBankingCo.Core.DataAccess/EventBankingCo.Core.DataAccess.csproj \
-            --configuration Release \
-            --no-build \
-            --output ./nupkgs \
-            /p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }}
-            
-      - name: Pack Request Handling project
-        run: |
-          dotnet pack ./EventBankingCo.Core.RequestHandling/EventBankingCo.Core.RequestHandling.csproj \
-            --configuration Release \
-            --no-build \
-            --output ./nupkgs \
-            /p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }}
-                
-      - name: Pack Api Shared project
-        run: |
-          dotnet pack ./EventBankingCo.Core.ApiShared/EventBankingCo.Core.ApiShared.csproj \
-            --configuration Release \
-            --no-build \
-            --output ./nupkgs \
-            /p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }}
-            
-      - name: Pack KafkaProducer project
-        run: |
-          dotnet pack ./EventBankingCo.Core.KafkaProducer/EventBankingCo.Core.KafkaProducer.csproj \
-            --configuration Release \
-            --no-build \
-            --output ./nupkgs \
-            /p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }}
+          mkdir -p ./nupkgs
+          for proj in ${{ steps.changes.outputs.changed_projects }}; do
+            echo "Packing $proj"
+            dotnet pack "$proj" \
+              --configuration Release \
+              --no-build \
+              --output ./nupkgs \
+              /p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }}
+          done
 
       - name: Push packages to NuGet
+        if: success()
         run: |
-          dotnet nuget push "./nupkgs/*.nupkg" \
-            --source https://api.nuget.org/v3/index.json \
-            --api-key ${{ secrets.NUGET_API_KEY }} \
-            --skip-duplicate
+          if compgen -G "./nupkgs/*.nupkg" > /dev/null; then
+            dotnet nuget push "./nupkgs/*.nupkg" \
+              --source https://api.nuget.org/v3/index.json \
+              --api-key ${{ secrets.NUGET_API_KEY }} \
+              --skip-duplicate
+          else
+            echo "No packages to push."
+          fi

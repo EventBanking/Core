@@ -27,7 +27,8 @@ namespace EventBankingCo.Core.Logging.Configurations
             loggerConfig.WriteTo.File(
                 _path,
                 outputTemplate: _outputTemplate,
-                rollingInterval: _rollingInterval
+                rollingInterval: _rollingInterval,
+                levelSwitch: GetLogLevelSwitch()
             );
     }
 

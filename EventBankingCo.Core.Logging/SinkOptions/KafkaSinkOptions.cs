@@ -18,7 +18,7 @@ namespace EventBankingCo.Core.Logging.Configurations
 
         public override LoggerConfiguration ConfigureSink(LoggerConfiguration loggerConfig) =>
             loggerConfig.WriteTo.Kafka(
-                _ => _topic,
+                _ => _topic,                
                 bootstrapServers: _servers
             );
     }
