@@ -37,15 +37,37 @@ jobs:
           echo "FullSemVer: ${{ steps.gitversion.outputs.fullSemVer }}"
           echo "NuGet Version: ${{ steps.gitversion.outputs.nuGetVersionV2 }}"
 
-      - name: Get changed projects
+      - name: Detect Changed and Dependent Projects
         id: changes
         run: |
-          echo "Changed projects:"
+          echo "Fetching changed projects..."
           git fetch origin main
           CHANGED=$(git diff --name-only origin/main...HEAD | grep '\.csproj$' || true)
+
+          echo "Changed project files:"
           echo "$CHANGED"
+
+          ALL_PROJECTS=$(find . -name '*.csproj')
+          echo "" > impacted_projects.txt
+
+          for proj in $CHANGED; do
+            echo "$proj" >> impacted_projects.txt
+
+            echo "Checking for transitive dependents of $proj..."
+            for candidate in $ALL_PROJECTS; do
+              if grep -q "$proj" "$candidate"; then
+                echo "$candidate depends on $proj"
+                echo "$candidate" >> impacted_projects.txt
+              fi
+            done
+          done
+
+          echo "Unique impacted projects:"
+          sort impacted_projects.txt | uniq > filtered_projects.txt
+          cat filtered_projects.txt
+
           echo "changed_projects<<EOF" >> $GITHUB_OUTPUT
-          echo "$CHANGED" >> $GITHUB_OUTPUT
+          cat filtered_projects.txt >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Restore dependencies
@@ -57,14 +79,30 @@ jobs:
       - name: Pack Changed Projects
         run: |
           mkdir -p ./nupkgs
-          for proj in ${{ steps.changes.outputs.changed_projects }}; do
-            echo "Packing $proj"
-            dotnet pack "$proj" \
-              --configuration Release \
-              --no-build \
-              --output ./nupkgs \
-              /p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }}
-          done
+          PACKED=()
+          SKIPPED=()
+
+          while IFS= read -r proj; do
+            if [ -f "$proj" ]; then
+              echo "Packing $proj"
+              dotnet pack "$proj" \
+                --configuration Release \
+                --no-build \
+                --output ./nupkgs \
+                /p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }}
+              PACKED+=("$proj")
+            else
+              SKIPPED+=("$proj")
+            fi
+          done < filtered_projects.txt
+
+          echo ""
+          echo "✅ Packed Projects:"
+          for p in "${PACKED[@]}"; do echo "  - $p"; done
+
+          echo ""
+          echo "⏭️ Skipped Projects (Not found):"
+          for s in "${SKIPPED[@]}"; do echo "  - $s"; done
 
       - name: Push packages to NuGet
         if: success()
@@ -75,5 +113,4 @@ jobs:
               --api-key ${{ secrets.NUGET_API_KEY }} \
               --skip-duplicate
           else
-            echo "No packages to push."
-          fi
+            echo "📦 No packages to push."
