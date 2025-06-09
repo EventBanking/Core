@@ -45,9 +45,9 @@ namespace EventBankingCo.Core.Logging.Implementation
         #region Private Helper Methods
 
         private ILogger CreateLog(object? extra, string memberName) =>
-            Log.ForContext("SourceContext", typeof(T).FullName)
-               .ForContext("Namespace", typeof(T).Namespace)
-               .ForContext("ClassName", typeof(T).Name)
+            Log.ForContext("SourceContext", _sourceContext)
+               .ForContext("Namespace", _namespace)
+               .ForContext("ClassName", _className)
                .ForContext("MethodName", memberName)
                .ForContext("Extra", extra);
 
