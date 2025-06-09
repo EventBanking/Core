@@ -17,13 +17,13 @@ namespace EventBankingCo.Core.RequestHandling.Implementation
 
         #region Constructor
 
-        public HandlerFactory(ITypeInstantiator typeActivator, IHandlerDictionary handlers, ICoreLogger<HandlerFactory> logger)
+        public HandlerFactory(ITypeInstantiator typeActivator, IHandlerDictionary handlers, ICoreLoggerFactory loggerFactory)
         {
             _typeActivator = typeActivator;
 
             _handlerDictionary = handlers;
 
-            _logger = logger;
+            _logger = loggerFactory.Create(this);
         }
 
         #endregion

@@ -20,8 +20,14 @@ namespace EventBankingCo.Core.Logging.Enrichers
                 {
                     var classNameProperty = propertyFactory.CreateProperty("ClassName", className);
                     logEvent.AddPropertyIfAbsent(classNameProperty);
+
+                    return;
                 }
             }
+
+            logEvent.AddPropertyIfAbsent(
+                propertyFactory.CreateProperty("ClassName", "Unknown")
+            );
         }
     }
 }

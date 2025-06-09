@@ -53,10 +53,10 @@ namespace EventBankingCo.Core.KafkaProducer
 
         #region Constructor
 
-        protected BaseProducer(IProducer<TKey, TValue> producer, ICoreLogger<BaseProducer<TKey, TValue>> logger, string topicName, Partition? partition = null)
+        protected BaseProducer(IProducer<TKey, TValue> producer, ICoreLoggerFactory loggerFactory, string topicName, Partition? partition = null)
         {
-            _producer = producer ?? throw new ArgumentNullException(nameof(producer), "Producer cannot be null.");
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger), "Logger cannot be null.");
+            _producer = producer;
+            _logger = loggerFactory.Create(this);
 
             if (string.IsNullOrWhiteSpace(topicName))
             {

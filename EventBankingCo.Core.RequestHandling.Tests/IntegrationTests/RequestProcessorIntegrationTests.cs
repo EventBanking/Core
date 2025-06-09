@@ -13,6 +13,8 @@ namespace EventBankingCo.Core.RequestHandling.Tests.IntegrationTests
 
         public RequestProcessorIntegrationTests()
         {
+            var coreLoggingFactoryStub = new CoreLoggingFactoryStub();
+
             var handlerDictionary = HandlerDictionary.FromAssemblyOf<TestRequest>();
 
             var serviceCollection = new ServiceCollection();
@@ -21,11 +23,11 @@ namespace EventBankingCo.Core.RequestHandling.Tests.IntegrationTests
 
             serviceCollection.AddRequestHandling(handlerDictionary);
 
-            var typeInstantiator = new TypeInstantiator(serviceCollection.BuildServiceProvider(), new Mock<ICoreLogger<TypeInstantiator>>().Object);
+            var typeInstantiator = new TypeInstantiator(serviceCollection.BuildServiceProvider(), coreLoggingFactoryStub);
 
-            var handlerFactory = new HandlerFactory(typeInstantiator, handlerDictionary, new Mock<ICoreLogger<HandlerFactory>>().Object);
+            var handlerFactory = new HandlerFactory(typeInstantiator, handlerDictionary, coreLoggingFactoryStub);
 
-            _requestProcessor = new RequestProcessor(handlerFactory, new Mock<ICoreLogger<RequestProcessor>>().Object);
+            _requestProcessor = new RequestProcessor(handlerFactory, coreLoggingFactoryStub);
         }
 
         [Fact]

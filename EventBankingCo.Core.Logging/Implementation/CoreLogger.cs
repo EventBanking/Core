@@ -5,6 +5,21 @@ namespace EventBankingCo.Core.Logging.Implementation
 {
     public class CoreLogger<T> : ICoreLogger<T>
     {
+        private readonly string? _sourceContext;
+
+        private readonly string? _namespace;
+
+        private readonly string? _className;
+
+        public CoreLogger(T t)
+        {
+            var type = t?.GetType();
+
+            _sourceContext = type?.FullName;
+            _namespace = type?.Namespace;
+            _className = type?.Name;
+        }
+
         #region ICoreLogger Implementation
 
         public void LogTrace(string message, object? extra = null, string memberName = "") =>

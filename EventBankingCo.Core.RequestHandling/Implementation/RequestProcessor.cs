@@ -9,11 +9,11 @@ namespace EventBankingCo.Core.RequestHandling.Implementation
 
         private readonly ICoreLogger<RequestProcessor> _logger;
 
-        public RequestProcessor(IHandlerFactory handlerFactory, ICoreLogger<RequestProcessor> logger)
+        public RequestProcessor(IHandlerFactory handlerFactory, ICoreLoggerFactory loggerFactory)
         {
-            _handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
+            _handlerFactory = handlerFactory;
 
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _logger = loggerFactory.Create(this);
         }
 
         public async Task ExecuteCommandAsync(ICommand command, CancellationToken cancellationToken = default) =>

@@ -15,11 +15,11 @@ namespace EventBankingCo.Core.RequestHandling.Implementation
 
         private readonly ICoreLogger<TypeInstantiator> _logger;
 
-        public TypeInstantiator(IServiceProvider serviceProvider, ICoreLogger<TypeInstantiator> logger)
+        public TypeInstantiator(IServiceProvider serviceProvider, ICoreLoggerFactory loggerFactory)
         {
             _serviceProvider = serviceProvider;
 
-            _logger = logger;
+            _logger = loggerFactory.Create(this);
         }
 
         public object Instantiate(Type typeToInstantiate)

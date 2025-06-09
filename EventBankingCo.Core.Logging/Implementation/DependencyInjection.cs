@@ -64,8 +64,6 @@ namespace EventBankingCo.Core.Logging.Implementation
 
             services.AddSingleton<ICoreLoggerFactory, CoreLoggerFactory>();
 
-            services.AddSingleton(typeof(ICoreLogger<>), typeof(CoreLogger<>));
-
             return services;
         }
     }
