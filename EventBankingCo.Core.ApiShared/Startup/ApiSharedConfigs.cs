@@ -25,9 +25,9 @@ namespace EventBankingCo.Core.ApiShared.Startup
 
         public ApiSharedConfigs(string serviceName, string databaseConnectionString, string kafkaSinkServer = "localhost:29092")
             : this (serviceName, databaseConnectionString, [
-                new ConsoleSinkOptions(),
+                new ConsoleSinkOptions(minLevel: "Debug"),
                 new FileSinkOptions(),
-                new KafkaSinkOptions(servers: kafkaSinkServer),
+                new KafkaSinkOptions(servers: kafkaSinkServer, enabled: false),
                 new SqlServerDatabaseSinkOptions(databaseConnectionString)
             ])
         {

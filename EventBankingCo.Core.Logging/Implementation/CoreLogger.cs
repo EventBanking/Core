@@ -31,6 +31,8 @@ namespace EventBankingCo.Core.Logging.Implementation
 
         private ILogger CreateLog(object? extra, string memberName) =>
             Log.ForContext("SourceContext", typeof(T).FullName)
+               .ForContext("Namespace", typeof(T).Namespace)
+               .ForContext("ClassName", typeof(T).Name)
                .ForContext("MethodName", memberName)
                .ForContext("Extra", extra);
 

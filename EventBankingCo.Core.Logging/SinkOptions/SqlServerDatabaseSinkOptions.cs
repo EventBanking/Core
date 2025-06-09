@@ -41,6 +41,8 @@ namespace EventBankingCo.Core.Logging.Configurations
                 new SqlColumn("ServiceName", SqlDbType.NVarChar),
                 new SqlColumn("SourceContext", SqlDbType.NVarChar),
                 new SqlColumn("Extra", SqlDbType.NVarChar),
+                new SqlColumn("Namespace", SqlDbType.NVarChar),
+                new SqlColumn("ClassName", SqlDbType.NVarChar),
             };
 
             if (additionalColumns != null && additionalColumns.Count > 0)
