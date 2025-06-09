@@ -2,6 +2,8 @@
 {
     public interface ICoreLoggerFactory
     {
-        ICoreLogger<T> Create<T>(T type);
+        ICoreLogger<T> Create<T>();
+
+        ICoreLogger<T> Create<T>(T t);
     }
 }

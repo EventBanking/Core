@@ -5,7 +5,9 @@ namespace EventBankingCo.Core.RequestHandling.Base
 {
     public abstract class RequestHandler<TRequest, TResponse> : CoreHandler<TRequest, TResponse> where TRequest : IRequest<TResponse>
     {
-        public RequestHandler(ICoreLoggerFactory loggerFactory) : base(loggerFactory) { }
+        private readonly ICoreLogger<RequestHandler<TRequest, TResponse>> _logger;
+
+        public RequestHandler(ICoreLoggerFactory loggerFactory) : base(loggerFactory) => _logger = loggerFactory.Create(this);
 
         protected abstract Task<TResponse> GetResponseAsync(TRequest request, CancellationToken cancellationToken);
 

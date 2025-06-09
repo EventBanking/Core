@@ -8,7 +8,7 @@ namespace EventBankingCo.Core.ApiShared.Base
 {
     public class CoreController
     {
-        protected readonly ICoreLogger<CoreController> _logger;
+        private readonly ICoreLogger<CoreController> _logger;
 
         private readonly IRequestProcessor _requestProcessor;
 
@@ -16,7 +16,7 @@ namespace EventBankingCo.Core.ApiShared.Base
         {
             _logger = loggerFactory.Create(this);
 
-            _requestProcessor = requestProccessor ?? throw new ArgumentNullException(nameof(requestProccessor), "Request Processor cannot be null");
+            _requestProcessor = requestProccessor;
         }
 
         protected async Task<IActionResult> ExecuteCommand(ICommand command, CancellationToken cancellationToken = default)

@@ -4,6 +4,8 @@ namespace EventBankingCo.Core.Logging.Implementation
 {
     public class CoreLoggerFactory : ICoreLoggerFactory
     {
-        public ICoreLogger<T> Create<T>(T type) => new CoreLogger<T>(type);
+        public ICoreLogger<T> Create<T>() => new CoreLogger<T>();
+
+        public ICoreLogger<T> Create<T>(T t) => Create<T>();
     }
 }

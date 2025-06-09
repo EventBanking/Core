@@ -11,9 +11,9 @@ namespace EventBankingCo.Core.Logging.Implementation
 
         private readonly string? _className;
 
-        public CoreLogger(T t)
+        public CoreLogger()
         {
-            var type = t?.GetType();
+            var type = typeof(T);
 
             _sourceContext = type?.FullName;
             _namespace = type?.Namespace;

@@ -5,7 +5,7 @@ namespace EventBankingCo.Core.RequestHandling.Base
 {
     public abstract class CoreHandler<TRequest, TResponse> : IRequestHandler<TRequest>
     {
-        protected ICoreLogger<CoreHandler<TRequest, TResponse>> _logger;
+        private ICoreLogger<CoreHandler<TRequest, TResponse>> _logger;
 
         protected CoreHandler(ICoreLoggerFactory loggerFactory)
         {
