@@ -20,6 +20,6 @@ namespace EventBankingCo.Core.Logging.Configurations
             loggerConfig.WriteTo.Kafka(
                 _ => _topic,                
                 bootstrapServers: _servers
-            );
+            ).MinimumLevel.ControlledBy(GetLogLevelSwitch());
     }
 }

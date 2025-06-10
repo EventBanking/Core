@@ -45,7 +45,6 @@ namespace EventBankingCo.Core.Logging.Implementation
 
                     loggerConfig.WriteTo.Logger(lc =>
                         sinkOption.ConfigureSink(lc)
-                                  .MinimumLevel.ControlledBy(sinkOption.GetLogLevelSwitch())
                     );
                 }
             }
