@@ -62,7 +62,14 @@ jobs:
           # Read direct dependencies from .csproj files
           for name in "${!PROJECT_PATHS[@]}"; do
             path="${PROJECT_PATHS[$name]}"
-            deps=$(grep '<ProjectReference Include=' "$path" | sed -E 's/.*Include="([^"]+)".*/\1/' | xargs -n1 basename | sed 's/.csproj//')
+            deps=""
+            while IFS= read -r line; do
+              include_path=$(echo "$line" | sed -E 's/.*Include="([^"]+)".*/\1/')
+              if [[ -n "$include_path" ]]; then
+                dep_name=$(basename "$include_path" .csproj)
+                deps="$deps $dep_name"
+              fi
+            done < <(grep '<ProjectReference Include=' "$path")
             PROJECT_DEPENDENCIES[$name]="$deps"
           done
 
