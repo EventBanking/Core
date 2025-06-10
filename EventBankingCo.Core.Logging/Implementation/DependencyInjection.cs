@@ -43,9 +43,13 @@ namespace EventBankingCo.Core.Logging.Implementation
                     // Add sinkOption to services to enable updating LogLevelSwitch at runtime
                     services.AddSingleton(sinkOption);
 
+                    var levelSwitch = sinkOption.GetLogLevelSwitch();
+
+                    services.AddSingleton(levelSwitch);
+
                     loggerConfig.WriteTo.Logger(lc =>
                         sinkOption.ConfigureSink(
-                            lc.MinimumLevel.ControlledBy(sinkOption.GetLogLevelSwitch())
+                            lc.MinimumLevel.ControlledBy(levelSwitch)
                         )
                     );
                 }
