@@ -7,7 +7,7 @@ namespace EventBankingCo.Core.Logging.Configurations
         private readonly string _outputTemplate;
 
         public ConsoleSinkOptions(
-            string minLevel = "Debug",
+            string minLevel = "Information",
             bool enabled = true,
             string outputTemplate = "[{Timestamp:HH:mm:ss.fff} {Level:u3}] CorrelationId: {CorrelationId} | {Message:lj}{NewLine}{Exception}"
         ) : base(minLevel, enabled)
