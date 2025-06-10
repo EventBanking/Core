@@ -7,8 +7,8 @@ on:
 
 jobs:
   publish:
+    name: Build and Publish Core NuGet Packages
     runs-on: ubuntu-latest
-    name: Build and Publish Changed NuGet Packages
 
     steps:
       - name: Checkout source
@@ -32,86 +32,86 @@ jobs:
         with:
           useConfigFile: true
 
-      - name: Output GitVersion Information
-        run: |
-          echo "FullSemVer: ${{ steps.gitversion.outputs.fullSemVer }}"
-          echo "NuGet Version: ${{ steps.gitversion.outputs.nuGetVersionV2 }}"
-
-      - name: Detect Changed and Dependent Projects
-        id: changes
-        run: |
-          echo "Fetching changed projects..."
-          git fetch origin main
-          CHANGED=$(git diff --name-only origin/main...HEAD | grep '\.csproj$' || true)
-
-          echo "Changed project files:"
-          echo "$CHANGED"
-
-          ALL_PROJECTS=$(find . -name '*.csproj')
-          echo "" > impacted_projects.txt
-
-          for proj in $CHANGED; do
-            echo "$proj" >> impacted_projects.txt
-
-            echo "Checking for transitive dependents of $proj..."
-            for candidate in $ALL_PROJECTS; do
-              if grep -q "$proj" "$candidate"; then
-                echo "$candidate depends on $proj"
-                echo "$candidate" >> impacted_projects.txt
-              fi
-            done
-          done
-
-          echo "Unique impacted projects:"
-          sort impacted_projects.txt | uniq > filtered_projects.txt
-          cat filtered_projects.txt
-
-          echo "changed_projects<<EOF" >> $GITHUB_OUTPUT
-          cat filtered_projects.txt >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
       - name: Restore dependencies
         run: dotnet restore EventBankingCo.Core.sln
 
       - name: Build solution
         run: dotnet build EventBankingCo.Core.sln --configuration Release --no-restore
 
-      - name: Pack Changed Projects
+      - name: Determine changed projects and pack (with transitive detection)
+        id: pack-projects
+        shell: bash
         run: |
-          mkdir -p ./nupkgs
-          PACKED=()
-          SKIPPED=()
+          set -e
+          git fetch origin main
 
-          while IFS= read -r proj; do
-            if [ -f "$proj" ]; then
-              echo "Packing $proj"
-              dotnet pack "$proj" \
+          mkdir -p ./nupkgs
+
+          declare -A PROJECT_PATHS
+          declare -A PROJECT_PACKED
+          declare -A PROJECT_DEPENDENCIES
+
+          # Define your projects
+          PROJECT_PATHS["Domain"]="EventBankingCo.Core.Domain/EventBankingCo.Core.Domain.csproj"
+          PROJECT_PATHS["Logging"]="EventBankingCo.Core.Logging/EventBankingCo.Core.Logging.csproj"
+          PROJECT_PATHS["DataAccess"]="EventBankingCo.Core.DataAccess/EventBankingCo.Core.DataAccess.csproj"
+          PROJECT_PATHS["RequestHandling"]="EventBankingCo.Core.RequestHandling/EventBankingCo.Core.RequestHandling.csproj"
+          PROJECT_PATHS["ApiShared"]="EventBankingCo.Core.ApiShared/EventBankingCo.Core.ApiShared.csproj"
+          PROJECT_PATHS["KafkaProducer"]="EventBankingCo.Core.KafkaProducer/EventBankingCo.Core.KafkaProducer.csproj"
+
+          # Read direct dependencies from .csproj files
+          for name in "${!PROJECT_PATHS[@]}"; do
+            path="${PROJECT_PATHS[$name]}"
+            deps=$(grep '<ProjectReference Include=' "$path" | sed -E 's/.*Include="([^"]+)".*/\1/' | xargs -n1 basename | sed 's/.csproj//')
+            PROJECT_DEPENDENCIES[$name]="$deps"
+          done
+
+          # Recursively detect if a project or any of its dependencies changed
+          has_changes() {
+            local project="$1"
+            local path="${PROJECT_PATHS[$project]}"
+            local folder="$(dirname "$path")"
+
+            if git diff --quiet origin/main...HEAD -- "$folder"; then
+              for dep in ${PROJECT_DEPENDENCIES[$project]}; do
+                if [[ -n "${PROJECT_PATHS[$dep]}" ]] && has_changes "$dep"; then
+                  return 0
+                fi
+              done
+              return 1
+            else
+              return 0
+            fi
+          }
+
+          ANY_PACKED=0
+
+          for name in "${!PROJECT_PATHS[@]}"; do
+            if has_changes "$name"; then
+              echo "📦 Packing $name (changed or transitive dependency changed)"
+              dotnet pack "${PROJECT_PATHS[$name]}" \
                 --configuration Release \
                 --no-build \
                 --output ./nupkgs \
                 /p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }}
-              PACKED+=("$proj")
+              PROJECT_PACKED["$name"]=1
+              ANY_PACKED=1
             else
-              SKIPPED+=("$proj")
+              echo "✅ Skipping $name (no direct or transitive changes)"
             fi
-          done < filtered_projects.txt
+          done
 
-          echo ""
-          echo "✅ Packed Projects:"
-          for p in "${PACKED[@]}"; do echo "  - $p"; done
-
-          echo ""
-          echo "⏭️ Skipped Projects (Not found):"
-          for s in "${SKIPPED[@]}"; do echo "  - $s"; done
+          echo "PACKED=$ANY_PACKED" >> "$GITHUB_OUTPUT"
 
       - name: Push packages to NuGet
-        if: success()
+        if: steps.pack-projects.outputs.PACKED == '1'
         run: |
-          if compgen -G "./nupkgs/*.nupkg" > /dev/null; then
-            dotnet nuget push "./nupkgs/*.nupkg" \
-              --source https://api.nuget.org/v3/index.json \
-              --api-key ${{ secrets.NUGET_API_KEY }} \
-              --skip-duplicate
-          else
-            echo "📦 No packages to push."
-          fi
+          echo "📤 Pushing packages to NuGet..."
+          dotnet nuget push "./nupkgs/*.nupkg" \
+            --source https://api.nuget.org/v3/index.json \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --skip-duplicate
+
+      - name: Skip NuGet Push
+        if: steps.pack-projects.outputs.PACKED != '1'
+        run: echo "🛑 No projects were packed. Skipping NuGet push."
