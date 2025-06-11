@@ -3,7 +3,7 @@ using System.Data;
 
 namespace EventBankingCo.Core.DataAccess.DataRequests
 {
-    public abstract class SqlFetch<TResponse> : IDataRequest<TResponse>
+    public abstract class SqlFetch<TResponse> : IDataFetch<TResponse>
     {
         public CommandType GetCommandType() => CommandType.Text;
 
