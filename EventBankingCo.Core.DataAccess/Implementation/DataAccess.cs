@@ -5,7 +5,7 @@ using Dapper;
 
 namespace EventBankingCo.Core.DataAccess.Implementation
 {
-    internal class DataAccess : IDataAccess
+    public class DataAccess : IDataAccess
     {
         private readonly IDbConnectionFactory _dbConnectionFactory;
 
