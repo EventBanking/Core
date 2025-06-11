@@ -44,7 +44,7 @@ namespace EventBankingCo.Core.DataAccess.Implementation
 
         public async Task<IEnumerable<TResponse>> FetchListAsync<TResponse>(IDataFetchList<TResponse> request) =>
             await HandleRequestAsync(request, async dapper => 
-                await dapper.QueryAsync<TResponse>(request.GetSql(), request.GetParameters())) ?? [];
+                await dapper.QueryAsync<TResponse>(request.GetSql(), request.GetParameters(), commandType: request.GetCommandType())) ?? [];
 
         private TResponse? HandleRequest<TResponse>(IDataRequest<TResponse> request, Func<IDbConnection, TResponse?> func)
         {
